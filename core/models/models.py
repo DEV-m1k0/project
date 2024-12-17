@@ -6,22 +6,29 @@ from django.db import models
 
 class Organization(models.Model):
     title = models.CharField(max_length=255)
-    subdivisions = models.ManyToManyField("Subdivision", related_name="subdivisions")
+    subdivisions = models.ManyToManyField("Subdivision", related_name="subdivisions", blank=True)
 
 
 class Subdivision(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField(max_length=255)
-    supervisor = models.ForeignKey("Employee", on_delete=models.CASCADE, related_name="supervisor")
-    employees = models.ManyToManyField("Employee", related_name="subdivision_employees")
+    description = models.TextField(max_length=255, null=True)
+    supervisor = models.ForeignKey("Employee", on_delete=models.SET_NULL, related_name="supervisor", null=True)
+    employees = models.ManyToManyField("Employee", related_name="subdivision_employees", null=True)
+    sub_sub_division = models.ForeignKey("SubSubDivision", on_delete=models.SET_NULL, null=True, blank=True)
 
+
+class SubSubDivision(models.Model):
+    title = models.CharField(max_length=255)
 
 class Position(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return str(self.title)
 
 
 class Cabinet(models.Model):
-    title = models.CharField(max_length=10)
+    title = models.CharField(max_length=10, unique=True)
 
 
 class CalendarSkip(models.Model):
@@ -87,19 +94,19 @@ class Event(models.Model):
     education_id = models.ForeignKey("Education", on_delete=models.CASCADE, related_name="education")
 
 
-class EmployeeMoreInfo(models.Model):
-    birthday = models.DateField()
-    personal_phone = models.CharField(max_length=20)
-
-
 class Employee(AbstractUser):
     patronymic = models.CharField(max_length=255)
     position_id = models.ForeignKey("Position", on_delete=models.SET_NULL, null=True, related_name="position")
     work_phone = models.CharField(max_length=20)
     cabinet_id = models.ForeignKey("Cabinet", on_delete=models.SET_NULL, null=True, related_name="cabinet")
+    email = models.EmailField(max_length=255)
     boss_id = models.ForeignKey("Employee", on_delete=models.SET_NULL, related_name="boss", null=True)
     helper_id = models.ForeignKey("Employee", on_delete=models.SET_NULL, related_name="helper", null=True)
-    more_info_id = models.ForeignKey("EmployeeMoreInfo", on_delete=models.SET_NULL, null=True, related_name="more_info")
+    subdivision = models.ForeignKey("SubDivision", on_delete=models.SET_NULL, null=True, related_name="employee_subdivision")
+    sub_sub_division = models.ForeignKey("SubSubDivision", on_delete=models.SET_NULL, null=True, related_name="employye_sub_sub_division")
+    more_info = models.TextField(max_length=255, null=True)
+    birthday = models.DateField()
+    personal_phone = models.CharField(max_length=20, null=True)
 
 
 class DocumentCategory(models.Model):
