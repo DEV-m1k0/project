@@ -59,15 +59,14 @@ class Command(BaseCommand):
                     organization.save()
                     organization.subdivisions.add(sub_division)
                     organization.save()
-                # try:
-                full_name = str(row[1]).split(" ")
-                print(pos)
-                employee = Employee(first_name=full_name[1], last_name=full_name[0], patronymic=full_name[2],
-                                    birthday=row[2], work_phone=row[3], cabinet_id=cab, email=row[5], position_id=pos,
-                                    username=full_name, password=make_password(full_name[0]))
-                employee.subdivision = sub_division
-                if sub_sub_division != "":
-                    employee.sub_sub_division = sub_sub_division
-                employee.save()
-                # except:
-                #     print("Пользователь")
+                try:
+                    full_name = str(row[1]).split(" ")
+                    employee = Employee(first_name=full_name[1], last_name=full_name[0], patronymic=full_name[2],
+                                        birthday=row[2], work_phone=row[3], cabinet_id=cab, email=row[5], position_id=pos,
+                                        username=row[1], password=make_password(full_name[0]))
+                    employee.subdivision = sub_division
+                    if sub_sub_division != "":
+                        employee.sub_sub_division = sub_sub_division
+                    employee.save()
+                except:
+                    pass
